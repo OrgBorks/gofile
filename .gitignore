@@ -1,0 +1,9 @@
+# python venv
+.venv
+
+# nuitka outputs
+build*
+gofile
+
+# test files
+*.txt
