@@ -2,7 +2,7 @@
 .venv
 
 # nuitka outputs
-build*
+*build*
 gofile
 
 # test files
