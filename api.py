@@ -31,13 +31,6 @@ def process_json(r):
         raise APIExcpetion(f"{err}\n{r}, {re}")
     return re["data"]
 
-def getContent(contentId, token):
-    payload = {
-        "contentId": contentId,
-        "token": token
-    }
-    return process_json(requests.get(url=f"{baseurl}getcontent", data=payload))
-
 def getServer() -> str:
     """Get optimal upload server.
 
@@ -46,6 +39,31 @@ def getServer() -> str:
     """
     r = process_json(requests.get(url=f"{baseurl}getserver"))
     return r["server"]
+
+def getContent(contentId, token):
+    payload = {
+        "contentId": contentId,
+        "token": token
+    }
+    return process_json(requests.get(url=f"{baseurl}getcontent", data=payload))
+
+def getAccountDetails(token: str, allDetails: bool = False):
+    """Gets the details about an account.
+
+    Args:
+        token (str): User's token.
+        allDetails (bool, optional): Verbose details. Defaults to False.
+
+    Returns:
+        dict: User's details.
+    """
+    payload = {
+        "token": token
+    }
+    if allDetails:
+        payload["allDetails"] = True
+    
+    return process_json(requests.get(url=f"{baseurl}getaccountdetails", data=payload))
 
 def loopContents(contents, depth = "\t"):
     for content in contents:
@@ -56,7 +74,20 @@ def loopContents(contents, depth = "\t"):
 # -=-=-=-= CLI Commands =-=-=-=-
 
 @cli.command
-def uploadFile(filePath, token=None, folderId=None, ):
+def uploadFile(filePath, token=None, folderId=None):
+    """Uploads a file to the GoFile servers.
+
+    Args:
+        filePath (str): The path to the file being uploaded.
+        token (str, optional): User's token. Defaults to a guest account.
+        folderId (str, optional): ID of the folder being uploaded to. Defaults to the root folder.
+
+    Raises:
+        ArgumentError: Raised if a folderId is inputed without a token.
+
+    Returns:
+        str: Information about the file that was just uploaded.
+    """
     payload = {}
     if token:
         payload["token"] = token
@@ -110,26 +141,34 @@ def copyContent(contentsId: list, folderIdDest, token):
 
 @cli.command
 def deleteContent(contentsId: list, token):
+    """Deletes a file.
+
+    Args:
+        contentsId (list): List of contentIds.
+        token (str): User's token.
+    """
     payload = {
         "contentsId": ",".join(contentsId),
         "token": token
     }
     process_json(requests.delete(url=f"{baseurl}deletecontent", data=payload))
-
-@cli.command
-def getAccountDetails(token: str, allDetails: bool = False):
-    payload = {
-        "token": token
-    }
-    if allDetails:
-        payload["allDetails"] = True
-    
-    return process_json(requests.get(url=f"{baseurl}getaccountdetails", data=payload))
+    print("File deleted.")
 
 # -=-=-=-= Custom commands =-=-=-=-
 
 @cli.command
 def getContents(token = None, contentId = None):
+    """Gets the details of a folder or information about a file.
+
+    Requires the full API.
+
+    Args:
+        token (string, optional): User's token. Defaults to None.
+        contentId (string, optional): ContentId of the content being accessed. Defaults to user's root folder.
+
+    Raises:
+        ArgumentException: Raised when no token is input.
+    """
     if not token:
         token = os.environ.get("token")
     if not token:
