@@ -1,5 +1,3 @@
-argparse
 requests
-json
 py3cli
 tk

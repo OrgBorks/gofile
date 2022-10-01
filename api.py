@@ -1,4 +1,4 @@
-#!./.venv/bin/python3
+#!.venv/bin/python3
 
 from argparse import ArgumentError
 import requests
@@ -25,7 +25,6 @@ def process_json(r):
         raise APIExcpetion(f"{err}\n{r}, {re}")
     return re["data"]
 
-@cli.command
 def getServer() -> str:
     """Get optimal upload server.
 
@@ -50,7 +49,6 @@ def uploadFile(filePath, token=None, folderId=None, ):
         f.close()
         return r
 
-@cli.command
 def getContent(contentId, token):
     payload = {
         "contentId": contentId,
