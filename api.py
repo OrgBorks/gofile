@@ -4,6 +4,10 @@ from argparse import ArgumentError
 import requests
 import json
 from pycli import CLI
+from py_dotenv import read_dotenv
+import os
+
+read_dotenv(".env")
 
 cli = CLI(prog="api.py", version="v1.0")
 
@@ -11,6 +15,8 @@ baseurl = "https://api.gofile.io/"
 
 class APIExcpetion(BaseException):
     pass
+
+# -=-=-=-= Helper Functions =-=-=-=-
 
 def process_json(r):
     re = json.loads(r.content)
@@ -25,6 +31,13 @@ def process_json(r):
         raise APIExcpetion(f"{err}\n{r}, {re}")
     return re["data"]
 
+def getContent(contentId, token):
+    payload = {
+        "contentId": contentId,
+        "token": token
+    }
+    return process_json(requests.get(url=f"{baseurl}getcontent", data=payload))
+
 def getServer() -> str:
     """Get optimal upload server.
 
@@ -33,6 +46,14 @@ def getServer() -> str:
     """
     r = process_json(requests.get(url=f"{baseurl}getserver"))
     return r["server"]
+
+def loopContents(contents, depth = "\t"):
+    for content in contents:
+        print(depth + content["name"])
+        if content["type"] == "folder":
+            loopContents(content["contents"], depth+"\t")
+
+# -=-=-=-= CLI Commands =-=-=-=-
 
 @cli.command
 def uploadFile(filePath, token=None, folderId=None, ):
@@ -47,14 +68,8 @@ def uploadFile(filePath, token=None, folderId=None, ):
         s = getServer()
         r = process_json(requests.post(url=f"https://{s}.gofile.io/uploadfile", data=payload, files={"file": f}))
         f.close()
+        print(f"Successfully uploaded. Find your file at {r['downloadPage']}")
         return r
-
-def getContent(contentId, token):
-    payload = {
-        "contentId": contentId,
-        "token": token
-    }
-    return process_json(requests.get(url=f"{baseurl}getcontent", data=payload))
 
 @cli.command
 def createFolder(folderID, folderName, token):
@@ -110,6 +125,20 @@ def getAccountDetails(token: str, allDetails: bool = False):
         payload["allDetails"] = True
     
     return process_json(requests.get(url=f"{baseurl}getaccountdetails", data=payload))
+
+# -=-=-=-= Custom commands =-=-=-=-
+
+@cli.command
+def getContents(token = None, contentId = None):
+    if not token:
+        token = os.environ.get("token")
+    if not token:
+        raise ArgumentException("Please input a token or put your token into a .env file.")
+    if not contentId:
+        contentId = getAccountDetails(token)["rootFolder"]
+    contents = getContent(contentId, token)
+    print(f"[{contents['name']}]")
+    loopContents(contents["contents"])
 
 cli.run()
 
