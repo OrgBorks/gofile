@@ -1,6 +1,9 @@
 # python venv
 .venv
 
+# environment files
+.env
+
 # nuitka outputs
 *build*
 gofile
