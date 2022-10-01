@@ -41,6 +41,17 @@ def getServer() -> str:
     return r["server"]
 
 def getContent(contentId, token):
+    """Gets a piece of content from the GoFile server.
+
+    Requires access to the full API.
+
+    Args:
+        contentId (str): The ID of the content being accessed.
+        token (str): User's token
+
+    Returns:
+        dict: The contents of the file or folder accessed.
+    """
     payload = {
         "contentId": contentId,
         "token": token
@@ -104,6 +115,13 @@ def uploadFile(filePath, token=None, folderId=None):
 
 @cli.command
 def createFolder(folderID, folderName, token):
+    """Create a folder.
+
+    Args:
+        folderID (str): ID of the parent folder to create the new folder in.
+        folderName (str): Name of the new folder.
+        token (str): User's token.
+    """
     payload = {
         "parentFolderId": folderID,
         "folderName": folderName,
@@ -113,9 +131,29 @@ def createFolder(folderID, folderName, token):
 
 @cli.command
 def setFolderOption(token, folderId, option, value):
+    """Set the options on a folder.
+
+    Avaliable options:
+        public
+        password
+        description
+        expire
+        tags
+
+    Args:
+        token (str): User's token.
+        folderId (str): ID of the folder.
+        option (str): The option to be changed.
+        value (Any): The new value for the option.
+
+    Raises:
+        ArgumentError: Raised when an invalid option or value is given.
+    """
     # validation code
     if option not in ["public", "password", "description", "expire", "tags"]:
         raise ArgumentError("Unrecognized option for \"option\" argument.")
+    if option in ["password", "description"]:
+        value = str(value)
     if option == "public" and value is not bool:
         raise ArgumentError("Invalid argument for \"public\" option.")
     if option == "expire" and value is not int:
@@ -132,6 +170,13 @@ def setFolderOption(token, folderId, option, value):
 
 @cli.command
 def copyContent(contentsId: list, folderIdDest, token):
+    """Copy files or folders into another folder.
+
+    Args:
+        contentsId (list): List of content to copy.
+        folderIdDest (str): Destination to copy the content to.
+        token (str): User's token.
+    """
     payload = {
         "contentsId": ",".join(contentsId),
         "folderIdDest": folderIdDest,
@@ -163,8 +208,8 @@ def getContents(token = None, contentId = None):
     Requires the full API.
 
     Args:
-        token (string, optional): User's token. Defaults to None.
-        contentId (string, optional): ContentId of the content being accessed. Defaults to user's root folder.
+        token (str, optional): User's token. Defaults to None.
+        contentId (str, optional): ContentId of the content being accessed. Defaults to user's root folder.
 
     Raises:
         ArgumentException: Raised when no token is input.
@@ -172,7 +217,7 @@ def getContents(token = None, contentId = None):
     if not token:
         token = os.environ.get("token")
     if not token:
-        raise ArgumentException("Please input a token or put your token into a .env file.")
+        raise ArgumentError("Please input a token or put your token into a .env file.")
     if not contentId:
         contentId = getAccountDetails(token)["rootFolder"]
     contents = getContent(contentId, token)
