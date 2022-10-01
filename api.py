@@ -1,5 +1,6 @@
 #!.venv/bin/python3
 
+import contextlib
 from argparse import ArgumentError
 import requests
 import json
@@ -7,8 +8,8 @@ from pycli import CLI
 from py_dotenv import read_dotenv
 import os
 
-read_dotenv(".env")
-
+with contextlib.suppress(FileNotFoundError):
+    read_dotenv(".env")
 cli = CLI(prog="api.py", version="v1.0")
 
 baseurl = "https://api.gofile.io/"
