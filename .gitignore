@@ -8,5 +8,8 @@
 *build*
 gofile
 
+# ide files
+.vscode
+
 # test files
 *.txt
