@@ -5,12 +5,7 @@ from argparse import ArgumentError
 import requests
 import json
 from pycli import CLI
-from py_dotenv import read_dotenv
-import os
-import pyglet
 
-with contextlib.suppress(FileNotFoundError):
-    read_dotenv(".env")
 cli = CLI(prog="api.py", version="v1.0")
 
 baseurl = "http://api.gofile.io/"
