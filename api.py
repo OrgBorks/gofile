@@ -7,12 +7,13 @@ import json
 from pycli import CLI
 from py_dotenv import read_dotenv
 import os
+import pyglet
 
 with contextlib.suppress(FileNotFoundError):
     read_dotenv(".env")
 cli = CLI(prog="api.py", version="v1.0")
 
-baseurl = "https://api.gofile.io/"
+baseurl = "http://api.gofile.io/"
 
 class APIExcpetion(BaseException):
     pass
@@ -24,11 +25,12 @@ def process_json(r):
     if re["status"] != "ok":
         err = ""
         if re["status"] in ["error-auth", "error-noAuth"]:
-            err = "You do not have access to the full API."
+            err = "There's something wrong with your authentification. Please try again."
         elif re["status"] == "error-wrongServer":
             err = "Please try again."
         else:
             err = "Status: {re['status']}"
+        # print(r.headers)
         raise APIExcpetion(f"{err}\n{r}, {re}")
     return re["data"]
 
@@ -54,11 +56,12 @@ def getContent(contentId, token):
         dict: The contents of the file or folder accessed.
     """
     payload = {
-        "contentId": contentId,
-        "token": token
+        "token": token,
+        "contentId": contentId
     }
-    return process_json(requests.get(url=f"{baseurl}getcontent", data=payload))
+    return process_json(requests.get(url=f"{baseurl}getcontent", params=payload))
 
+@cli.command
 def getAccountDetails(token: str, allDetails: bool = False):
     """Gets the details about an account.
 
@@ -75,15 +78,15 @@ def getAccountDetails(token: str, allDetails: bool = False):
     if allDetails:
         payload["allDetails"] = True
     
-    return process_json(requests.get(url=f"{baseurl}getaccountdetails", data=payload))
+    print( process_json(requests.get(url=f"{baseurl}getaccountdetails", params=payload)))
 
-def loopContents(contents, depth = "\t"):
-    for content in contents:
-        print(depth + content["name"])
+def loopContents(contents, token, depth = "  "):
+    for content in contents.values():
+        print(f"{depth}{content['name']} - {content['type']}")
         if content["type"] == "folder":
-            loopContents(content["contents"], depth+"\t")
+            loopContents(getContent(content["id"], token)["contents"], token, f"{depth}  ")
 
-# -=-=-=-= CLI Commands =-=-=-=-
+# -=-=-=-= API Commands =-=-=-=-
 
 @cli.command
 def uploadFile(filePath, token=None, folderId=None):
@@ -109,13 +112,13 @@ def uploadFile(filePath, token=None, folderId=None):
         payload["folderId"] = folderId
     with open(filePath) as f:
         s = getServer()
-        r = process_json(requests.post(url=f"https://{s}.gofile.io/uploadfile", data=payload, files={"file": f}))
+        r = process_json(requests.post(url=f"https://{s}.gofile.io/uploadfile", params=payload, files={"file": f}))
         f.close()
         print(f"Successfully uploaded. Find your file at {r['downloadPage']}")
         return r
 
 @cli.command
-def createFolder(folderID, folderName, token):
+def createFolder(folderID: str, folderName: str, token: str):
     """Create a folder.
 
     Args:
@@ -124,9 +127,9 @@ def createFolder(folderID, folderName, token):
         token (str): User's token.
     """
     payload = {
+        "token": token,
         "parentFolderId": folderID,
-        "folderName": folderName,
-        "token": token
+        "folderName": folderName
     }
     process_json(requests.put(url=f"{baseurl}createfolder", data=payload))
 
@@ -179,9 +182,9 @@ def copyContent(contentsId: list, folderIdDest, token):
         token (str): User's token.
     """
     payload = {
+        "token": token,
         "contentsId": ",".join(contentsId),
-        "folderIdDest": folderIdDest,
-        "token": token
+        "folderIdDest": folderIdDest
     }
     process_json(requests.put(url=f"{baseurl}copycontent", data=payload))
 
@@ -194,36 +197,33 @@ def deleteContent(contentsId: list, token):
         token (str): User's token.
     """
     payload = {
-        "contentsId": ",".join(contentsId),
-        "token": token
+        "contentsId": ",".join(contentsId)
     }
-    process_json(requests.delete(url=f"{baseurl}deletecontent", data=payload))
+    print(",".join(contentsId))
+    process_json(requests.delete(url=f"{baseurl}deletecontent", data=payload, params={"token": token}))
     print("File deleted.")
 
 # -=-=-=-= Custom commands =-=-=-=-
 
 @cli.command
-def getContents(token = None, contentId = None):
+def getContents(token, contentId = None):
     """Gets the details of a folder or information about a file.
 
     Requires the full API.
 
     Args:
-        token (str, optional): User's token. Defaults to None.
+        token (str): User's token.
         contentId (str, optional): ContentId of the content being accessed. Defaults to user's root folder.
 
     Raises:
         ArgumentException: Raised when no token is input.
     """
-    if not token:
-        token = os.environ.get("token")
-    if not token:
-        raise ArgumentError("Please input a token or put your token into a .env file.")
     if not contentId:
         contentId = getAccountDetails(token)["rootFolder"]
     contents = getContent(contentId, token)
-    print(f"[{contents['name']}]")
-    loopContents(contents["contents"])
+    print(f"[{contents['name']} - {contents['type']}]")
+    if contents["type"] == "folder":
+        loopContents(contents["contents"], token)
 
 cli.run()
 
