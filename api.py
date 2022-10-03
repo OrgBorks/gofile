@@ -73,7 +73,7 @@ def getAccountDetails(token: str, allDetails: bool = False):
     if allDetails:
         payload["allDetails"] = True
     
-    print( process_json(requests.get(url=f"{baseurl}getaccountdetails", params=payload)))
+    return process_json(requests.get(url=f"{baseurl}getaccountdetails", params=payload))
 
 def loopContents(contents, token, depth = "  "):
     for content in contents.values():
