@@ -56,7 +56,6 @@ def getContent(contentId, token):
     }
     return process_json(requests.get(url=f"{baseurl}getcontent", params=payload))
 
-@cli.command
 def getAccountDetails(token: str, allDetails: bool = False):
     """Gets the details about an account.
 
