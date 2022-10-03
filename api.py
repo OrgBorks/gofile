@@ -191,16 +191,16 @@ def deleteContent(contentsId: list, token):
         token (str): User's token.
     """
     payload = {
+        "token": token,
         "contentsId": ",".join(contentsId)
     }
-    print(",".join(contentsId))
-    process_json(requests.delete(url=f"{baseurl}deletecontent", data=payload, params={"token": token}))
+    process_json(requests.delete(url=f"{baseurl}deletecontent", data=payload))
     print("File deleted.")
 
 # -=-=-=-= Custom commands =-=-=-=-
 
 @cli.command
-def getContents(token, contentId = None):
+def getContents(token, contentId = None, full: bool = False):
     """Gets the details of a folder or information about a file.
 
     Requires the full API.
@@ -217,7 +217,11 @@ def getContents(token, contentId = None):
     contents = getContent(contentId, token)
     print(f"[{contents['name']} - {contents['type']}]")
     if contents["type"] == "folder":
-        loopContents(contents["contents"], token)
+        if full:
+            loopContents(contents["contents"], token)
+        else:
+            for content in contents["contents"].values():
+                print(f"  {content['name']} - {content['type']}")
 
 cli.run()
 
