@@ -228,7 +228,67 @@ def getContents(token, contentId = None, full: bool = False):
 window = tk.Tk()
 window.title("GoFile")
 
-# -=-=-=-= learning tk =-=-=-=-
+
+def openfile():
+    f = filedialog.askopenfilename()
+    print(f)
+
+# lists
+leftButtons = []
+uploadScreen = []
+filesScreen = []
+
+# main window
+window.rowconfigure(0, minsize=100, weight=1)
+window.columnconfigure(1, minsize=100, weight=1)
+window.configure(bg="#454D55")
+window.geometry("400x400")
+
+# left button area
+buttonArea = tk.Frame(window, bg="#343A40")
+buttonArea.grid(column=0, sticky="ns")
+
+# upload file button
+opnBtn = tk.Button(
+    buttonArea, text="Upload Files", width=15,
+    command=openfile)
+opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
+leftButtons.append(opnBtn)
+for btn in leftButtons:
+    btn["relief"] = tk.FLAT
+    btn["bg"] = "#343A40"
+    btn["fg"] = "white"
+    btn["activebackground"] = "#494E54"
+    btn["activeforeground"] = "white"
+    btn["highlightbackground"] = "#343A40"
+    btn["highlightcolor"] = "#343A40"
+
+# files screen - WIP
+contentFrame = tk.Frame(window, bg="#343A40")
+contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
+flair = tk.Canvas(contentFrame, bg="#3F6791", highlightbackground="#3F6791")
+flair.configure(width=contentFrame["width"], height=1)
+flair.pack(fill="x")
+text = tk.Label(contentFrame, text="Gaming", bg=contentFrame["background"], fg="white", anchor="center")
+text.pack(fill="x", padx=5, pady=5)
+
+window.mainloop()
+
+# [== notes ==]
+
+# -- file dialogs --
+# -- file open (get filepath) --
+# filedialog.askopenfilename()
+
+# -- file save (get folder) --
+# filedialog.askdirectory()
+
+# -- downloading files --
+# r = requests.get(url=url)
+# with open(<path>) as f:
+#     f.write(r.content)
+
+# -- learning tk --
 
 # greeting = tk.Label(
 #     text="Hello, World!",
@@ -271,49 +331,8 @@ window.title("GoFile")
 # button = tk.Button(text="Roll", width=9, height=3, command=roll)
 # button.pack()
 
-def openfile():
-    f = filedialog.askopenfilename()
-    print(f)
-
-# main window
-window.rowconfigure(0, minsize=100, weight=1)
-window.columnconfigure(1, minsize=100, weight=1)
-window.configure(bg="#454D55")
-
-# left button area
-buttonFrame = tk.Frame(window, bg="#343A40")
-buttonFrame.grid(column=0, sticky="ns")
-
-# upload file button
-opnBtn = tk.Button(
-    buttonFrame, text="Upload Files", width=9,
-    command=openfile, relief=tk.FLAT, bg="#343A40",
-    fg="white", activebackground="#494E54",
-    activeforeground="white", highlightbackground="#343A40",
-    highlightcolor="#343A40")
-opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
-
-# files screen - WIP
-contentFrame = tk.Frame(window, bg="#343A40")
-contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nwe")
-flair = tk.Canvas(contentFrame, bg="navy", highlightbackground="#343A40")
-flair.configure(width=contentFrame["width"], height=5)
-flair.pack(fill="x")
-text = tk.Label(contentFrame, text="Gaming", bg=contentFrame["background"], justify="center", fg="white")
-text.pack(anchor="center", fill="x", padx=5, pady=5)
-
-window.mainloop()
-
-# [== notes ==]
-
-# -- file dialogs --
-# -- file open (get filepath) --
-# filedialog.askopenfilename()
-
-# -- file save (get folder) --
-# filedialog.askdirectory()
-
-# -- downloading files --
-# r = requests.get(url=url)
-# with open(<path>) as f:
-#     f.write(r.content)
+# -- tk unpacking --
+# text.pack() -- pack
+# text.pack_forget() -- hide
+# text.destroy() -- delete
+# works with .grid() too
