@@ -1,12 +1,13 @@
-#!.venv/bin/python3
-
 import contextlib
 from argparse import ArgumentError
+from tkinter import ttk
 import requests
 import json
 from pycli import CLI
+import tkinter as tk
+from tkinter import filedialog
 
-cli = CLI(prog="api.py", version="v1.0")
+# cli = CLI(prog="api.py", version="v1.0")
 
 baseurl = "http://api.gofile.io/"
 
@@ -82,7 +83,7 @@ def loopContents(contents, token, depth = "  "):
 
 # -=-=-=-= API Commands =-=-=-=-
 
-@cli.command
+# @cli.command
 def uploadFile(filePath, token=None, folderId=None):
     """Uploads a file to the GoFile servers.
 
@@ -111,7 +112,7 @@ def uploadFile(filePath, token=None, folderId=None):
         print(f"Successfully uploaded. Find your file at {r['downloadPage']}")
         return r
 
-@cli.command
+# @cli.command
 def createFolder(folderID: str, folderName: str, token: str):
     """Create a folder.
 
@@ -127,7 +128,7 @@ def createFolder(folderID: str, folderName: str, token: str):
     }
     process_json(requests.put(url=f"{baseurl}createfolder", data=payload))
 
-@cli.command
+# @cli.command
 def setFolderOption(token, folderId, option, value):
     """Set the options on a folder.
 
@@ -166,7 +167,7 @@ def setFolderOption(token, folderId, option, value):
     }
     process_json(requests.put(url=f"{baseurl}setfolderoption", data=payload))
 
-@cli.command
+# @cli.command
 def copyContent(contentsId: list, folderIdDest, token):
     """Copy files or folders into another folder.
 
@@ -182,7 +183,7 @@ def copyContent(contentsId: list, folderIdDest, token):
     }
     process_json(requests.put(url=f"{baseurl}copycontent", data=payload))
 
-@cli.command
+# @cli.command
 def deleteContent(contentsId: list, token):
     """Deletes a file.
 
@@ -199,7 +200,7 @@ def deleteContent(contentsId: list, token):
 
 # -=-=-=-= Custom commands =-=-=-=-
 
-@cli.command
+# @cli.command
 def getContents(token, contentId = None, full: bool = False):
     """Gets the details of a folder or information about a file.
 
@@ -223,7 +224,85 @@ def getContents(token, contentId = None, full: bool = False):
             for content in contents["contents"].values():
                 print(f"  {content['name']} - {content['type']}")
 
-cli.run()
+# cli.run()
+window = tk.Tk()
+window.title("GoFile")
+
+# -=-=-=-= learning tk =-=-=-=-
+
+# greeting = tk.Label(
+#     text="Hello, World!",
+#     foreground="red")
+# greeting.pack()
+
+# button = tk.Button(
+#     text="Click me",
+#     background="red",
+#     foreground="white",
+#     width=20,
+#     height=5
+# )
+# button.pack()
+
+# entry = tk.Entry(width=69)
+# entry.pack()
+
+# text = tk.Text()
+# text.pack()
+
+# window.columnconfigure(0, weight=2, minsize=69)
+# window.columnconfigure(2, weight=1, minsize=5)
+
+# label1 = tk.Label(text="why hello there", width=10, height=3, bg="yellow", master=window)
+# label2 = tk.Label(text="wack", width=10, height=3, bg="blue", master=window)
+# label3 = tk.Label(text="oml so silly", width=15, height=4, bg="red", master=window)
+# label1.grid(column=0)
+# label2.grid(column=1)
+# label3.grid(column=2)
+
+# die rolling:
+# def roll():
+#     import random
+#     dieNum["text"] = random.randint(1, 6)
+
+# dieNum = tk.Label(text="0", width=9, height=3)
+# dieNum.pack()
+
+# button = tk.Button(text="Roll", width=9, height=3, command=roll)
+# button.pack()
+
+def openfile():
+    f = filedialog.askopenfilename()
+    print(f)
+
+# main window
+window.rowconfigure(0, minsize=100, weight=1)
+window.columnconfigure(1, minsize=100, weight=1)
+window.configure(bg="#454D55")
+
+# left button area
+buttonFrame = tk.Frame(window, bg="#343A40")
+buttonFrame.grid(column=0, sticky="ns")
+
+# upload file button
+opnBtn = tk.Button(
+    buttonFrame, text="Upload Files", width=9,
+    command=openfile, relief=tk.FLAT, bg="#343A40",
+    fg="white", activebackground="#494E54",
+    activeforeground="white", highlightbackground="#343A40",
+    highlightcolor="#343A40")
+opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
+
+# files screen - WIP
+contentFrame = tk.Frame(window, bg="#343A40")
+contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nwe")
+flair = tk.Canvas(contentFrame, bg="navy", highlightbackground="#343A40")
+flair.configure(width=contentFrame["width"], height=5)
+flair.pack(fill="x")
+text = tk.Label(contentFrame, text="Gaming", bg=contentFrame["background"], justify="center", fg="white")
+text.pack(anchor="center", fill="x", padx=5, pady=5)
+
+window.mainloop()
 
 # [== notes ==]
 
