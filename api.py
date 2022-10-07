@@ -230,47 +230,48 @@ def getContents(token, contentId = None, full: bool = False):
 window = tk.Tk()
 window.title("GoFile")
 window.rowconfigure(0, minsize=100, weight=1)
+window.columnconfigure(0, minsize=200)
 window.columnconfigure(1, minsize=100, weight=1)
 window.configure(bg="#454D55")
-window.geometry("400x400")
+window.geometry("1366x768")
 
 # lists
 leftButtons = []
 uploadScreen = []
 filesScreen = []
 
-# show upload screen
-def openfile():
-    f = filedialog.askopenfilename()
-    print(f)
-
 # show profile screen
 def showProfile():
+    print(window.configure())
+
+# show upload screen
+def openfile():
     pass
 
 # left button area
-buttonArea = tk.Frame(window, bg="#343A40")
-buttonArea.grid(column=0, sticky="ns")
-
-# upload file button
-opnBtn = tk.Button(
-    buttonArea, text="Upload Files",
-    command=openfile
-)
-# opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
-leftButtons.append(opnBtn)
+buttonArea = tk.Frame(window, bg="#343A40", width=200)
+buttonArea.grid(column=0, sticky="nswe")
 
 # profile button
-out = tk.PhotoImage(file="img/id-card.png").subsample(23, 23)
+prfimg = tk.PhotoImage(file="img/id-card.png").subsample(22, 22)
 prfBtn = tk.Button(
     buttonArea, text="My Profile",
-    command=showProfile, image=out
+    command=showProfile, image=prfimg
 )
 leftButtons.append(prfBtn)
 
+# upload file button
+uplimg = tk.PhotoImage(file="img/file-arrow-up-solid.png").subsample(22, 22)
+opnBtn = tk.Button(
+    buttonArea, text="Upload Files",
+    command=openfile, image=uplimg
+)
+leftButtons.append(opnBtn)
+
 # configure all buttons
 for btn in leftButtons:
-    btn["width"] = 12
+    btn["width"] = buttonArea["width"] - 10
+    btn["anchor"] = "w"
     btn["relief"] = tk.FLAT
     btn["compound"] = tk.LEFT
     btn["bg"] = "#343A40"
