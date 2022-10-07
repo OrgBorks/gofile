@@ -225,24 +225,23 @@ def getContents(token, contentId = None, full: bool = False):
                 print(f"  {content['name']} - {content['type']}")
 
 # cli.run()
+
+# main window
 window = tk.Tk()
 window.title("GoFile")
-
-
-def openfile():
-    f = filedialog.askopenfilename()
-    print(f)
+window.rowconfigure(0, minsize=100, weight=1)
+window.columnconfigure(1, minsize=100, weight=1)
+window.configure(bg="#454D55")
+window.geometry("400x400")
 
 # lists
 leftButtons = []
 uploadScreen = []
 filesScreen = []
 
-# main window
-window.rowconfigure(0, minsize=100, weight=1)
-window.columnconfigure(1, minsize=100, weight=1)
-window.configure(bg="#454D55")
-window.geometry("400x400")
+def openfile():
+    f = filedialog.askopenfilename()
+    print(f)
 
 # left button area
 buttonArea = tk.Frame(window, bg="#343A40")
@@ -250,10 +249,12 @@ buttonArea.grid(column=0, sticky="ns")
 
 # upload file button
 opnBtn = tk.Button(
-    buttonArea, text="Upload Files", width=15,
+    buttonArea, text="Upload Files", width=12,
     command=openfile)
 opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
 leftButtons.append(opnBtn)
+
+# configure all buttons
 for btn in leftButtons:
     btn["relief"] = tk.FLAT
     btn["bg"] = "#343A40"
@@ -263,9 +264,10 @@ for btn in leftButtons:
     btn["highlightbackground"] = "#343A40"
     btn["highlightcolor"] = "#343A40"
 
+
 # files screen - WIP
 contentFrame = tk.Frame(window, bg="#343A40")
-contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nswe")
+contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nwe")
 flair = tk.Canvas(contentFrame, bg="#3F6791", highlightbackground="#3F6791")
 flair.configure(width=contentFrame["width"], height=1)
 flair.pack(fill="x")
