@@ -6,9 +6,6 @@ import json
 from pycli import CLI
 import tkinter as tk
 from tkinter import filedialog
-from PIL import ImageTk, Image
-from cairosvg import svg2png
-from io import BytesIO
 
 # cli = CLI(prog="api.py", version="v1.0")
 
