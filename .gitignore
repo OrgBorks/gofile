@@ -11,5 +11,6 @@ gofile
 # ide files
 .vscode
 
-# test files
+# test / temp files
 *.txt
+*.svg
