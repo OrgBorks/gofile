@@ -6,6 +6,9 @@ import json
 from pycli import CLI
 import tkinter as tk
 from tkinter import filedialog
+from PIL import ImageTk, Image
+from cairosvg import svg2png
+from io import BytesIO
 
 # cli = CLI(prog="api.py", version="v1.0")
 
@@ -239,9 +242,14 @@ leftButtons = []
 uploadScreen = []
 filesScreen = []
 
+# show upload screen
 def openfile():
     f = filedialog.askopenfilename()
     print(f)
+
+# show profile screen
+def showProfile():
+    pass
 
 # left button area
 buttonArea = tk.Frame(window, bg="#343A40")
@@ -249,14 +257,25 @@ buttonArea.grid(column=0, sticky="ns")
 
 # upload file button
 opnBtn = tk.Button(
-    buttonArea, text="Upload Files", width=12,
-    command=openfile)
-opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
+    buttonArea, text="Upload Files",
+    command=openfile
+)
+# opnBtn.grid(row=0, sticky="nwe", pady=2, padx=5)
 leftButtons.append(opnBtn)
+
+# profile button
+out = tk.PhotoImage(file="img/id-card.png").subsample(23, 23)
+prfBtn = tk.Button(
+    buttonArea, text="My Profile",
+    command=showProfile, image=out
+)
+leftButtons.append(prfBtn)
 
 # configure all buttons
 for btn in leftButtons:
+    btn["width"] = 12
     btn["relief"] = tk.FLAT
+    btn["compound"] = tk.LEFT
     btn["bg"] = "#343A40"
     btn["fg"] = "white"
     btn["activebackground"] = "#494E54"
@@ -264,8 +283,11 @@ for btn in leftButtons:
     btn["highlightbackground"] = "#343A40"
     btn["highlightcolor"] = "#343A40"
 
+for i in range(len(leftButtons)):
+    # pass
+    leftButtons[i].grid(row=i, sticky="nwe", pady=2, padx=5)
 
-# files screen - WIP
+# files screen - WIP - needs to be generated on the fly
 contentFrame = tk.Frame(window, bg="#343A40")
 contentFrame.grid(row=0, column=1, padx=5, pady=5, sticky="nwe")
 flair = tk.Canvas(contentFrame, bg="#3F6791", highlightbackground="#3F6791")
