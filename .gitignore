@@ -6,7 +6,9 @@
 
 # nuitka outputs
 *build*
+*dist*
 gofile
+*.bin
 
 # ide files
 .vscode
