@@ -1,5 +1,5 @@
-# GoFile API CLI
+# GoFile GUI
 
-Unofficial CLI for GoFile's API
+Unofficial GUI for GoFile's API
 
-Written in python, tk
+Written in python, tkinter
