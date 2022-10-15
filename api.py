@@ -1,11 +1,10 @@
-import contextlib
 from argparse import ArgumentError
-from tkinter import ttk
+from distutils.command.config import config
 import requests
 import json
 from pycli import CLI
 import tkinter as tk
-from tkinter import filedialog
+from tkinter import filedialog, ttk
 
 # cli = CLI(prog="api.py", version="v1.0")
 
@@ -226,6 +225,8 @@ def getContents(token, contentId = None, full: bool = False):
 
 # cli.run()
 
+# -=-=-=-= tkinter =-=-=-=-
+
 # main window
 window = tk.Tk()
 window.title("GoFile")
@@ -239,18 +240,37 @@ window.geometry("1366x768")
 leftButtons = []
 uploadScreen = []
 filesScreen = []
+rendered = []
 
-# show profile screen
-def showProfile():
-    print(window.configure())
+# configure all buttons
+def configureGrayButtons():
+    for btn in leftButtons:
+        if isinstance(btn, tk.Button):
+            btn["width"] = buttonArea["width"] - 10
+            btn["anchor"] = "w"
+            btn["relief"] = tk.FLAT
+            btn["compound"] = tk.LEFT
+            btn["bg"] = "#343A40"
+            btn["fg"] = "#c2c7d0"
+            btn["activebackground"] = "#494E54"
+            btn["activeforeground"] = "white"
+            btn["highlightbackground"] = "#343A40"
+            btn["highlightcolor"] = "#343A40"
 
-# show upload screen
-def openfile():
-    pass
+def configureWhiteButton(btn):
+    btn["fg"] = btn["bg"]
+    btn["bg"] = "#EBECEC"
+    btn["activebackground"] = btn["bg"]
+    btn["activeforeground"] = btn["fg"]
 
 # left button area
 buttonArea = tk.Frame(window, bg="#343A40", width=200)
 buttonArea.grid(column=0, sticky="nswe")
+
+# show profile screen
+def showProfile():
+    configureGrayButtons()
+    configureWhiteButton(prfBtn)
 
 # profile button
 prfimg = tk.PhotoImage(file="img/id-card.png").subsample(22, 22)
@@ -260,29 +280,62 @@ prfBtn = tk.Button(
 )
 leftButtons.append(prfBtn)
 
+# show file screen
+def showFiles():
+    configureGrayButtons()
+    configureWhiteButton(fileBtn)
+
+# file button
+fileimg = tk.PhotoImage(file="img/list-solid.png").subsample(22, 22)
+fileBtn = tk.Button(
+    buttonArea, text="My Files",
+    command=showFiles, image=fileimg
+)
+leftButtons.append(fileBtn)
+
+# show file screen
+def logout():
+    configureGrayButtons()
+    configureWhiteButton(logoutBtn)
+
+# file button
+logoutimg = tk.PhotoImage(file="img/right-from-bracket-solid.png").subsample(22, 22)
+logoutBtn = tk.Button(
+    buttonArea, text="Logout",
+    command=logout, image=logoutimg
+)
+leftButtons.append(logoutBtn)
+
+# show welcome screen
+def showWelcome():
+    configureGrayButtons()
+    configureWhiteButton(wlcBtn)
+
+# welcome button
+wlcimg = tk.PhotoImage(file="img/house-solid.png").subsample(22, 22)
+wlcBtn = tk.Button(
+    buttonArea, text="Welcome",
+    command=showWelcome, image=wlcimg
+)
+leftButtons.append(wlcBtn)
+
+# show upload screen
+def showUpload():
+    configureGrayButtons()
+    configureWhiteButton(opnBtn)
+
 # upload file button
 uplimg = tk.PhotoImage(file="img/file-arrow-up-solid.png").subsample(22, 22)
 opnBtn = tk.Button(
     buttonArea, text="Upload Files",
-    command=openfile, image=uplimg
+    command=showUpload, image=uplimg
 )
 leftButtons.append(opnBtn)
 
-# configure all buttons
-for btn in leftButtons:
-    btn["width"] = buttonArea["width"] - 10
-    btn["anchor"] = "w"
-    btn["relief"] = tk.FLAT
-    btn["compound"] = tk.LEFT
-    btn["bg"] = "#343A40"
-    btn["fg"] = "white"
-    btn["activebackground"] = "#494E54"
-    btn["activeforeground"] = "white"
-    btn["highlightbackground"] = "#343A40"
-    btn["highlightcolor"] = "#343A40"
+configureGrayButtons()
 
+leftButtons.insert(3, ttk.Separator(buttonArea, orient=tk.HORIZONTAL))
 for i in range(len(leftButtons)):
-    # pass
     leftButtons[i].grid(row=i, sticky="nwe", pady=2, padx=5)
 
 # files screen - WIP - needs to be generated on the fly
