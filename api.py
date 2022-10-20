@@ -223,6 +223,16 @@ def getContents(token, contentId = None, full: bool = False):
             for content in contents["contents"].values():
                 print(f"  {content['name']} - {content['type']}")
 
+@cli.command
+def getAccount(token):
+    account = getAccountDetails(token, True)
+    print(f"""Account: {account['email']}
+    Tier: {account['tier']} - ${account['tierAmount']}
+    Root folder: {account['rootFolder']}
+    File count: {account['filesCount']}
+    Total size: {account['totalSize']}
+    Total downloads: {account['total30DDLTraffic']}""")
+
 cli.run()
 
 # [== notes ==]
